@@ -12,19 +12,32 @@ import ssHead from './components/ssHead'
 import ssFooter from './components/ssFooter'
 //主体
 import ssContent from './components/ssContent'
+//常量
+import constant from'./components/constant/constant'
 
 Vue.config.productionTip = false
 
+//头
 Vue.component(
   'ssHead',ssHead
 )
+//脚
 Vue.component(
   'ssFooter',ssFooter,
 )
+//主要内容
 Vue.component(
   'ssContent',ssContent,
 
 )
+//全局发送方法
+Vue.prototype.sendToGateway = function (data) {
+  console.log(data);
+  // return 'http://csdn.net';
+}
+
+//常量文件
+Vue.prototype.constant = constant
 
 /* eslint-disable no-new */
 new Vue({
