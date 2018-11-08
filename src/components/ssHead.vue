@@ -58,18 +58,25 @@
                     <input type="password" v-model='pwd' class="form-control" id="inputPassword3" placeholder="密码">
                   </div>
                 </div>
-                <div class="form-group">
-                  <div class="col-sm-offset-2 col-sm-10">
-                    <div class="checkbox">
-                      <label>
-                        <input type="checkbox"> 记住我
-                      </label>
-                    </div>
-                  </div>
-                </div>
+                <!--<div class="form-group">-->
+                  <!--<div class="col-sm-offset-2 col-sm-10">-->
+                    <!--<div class="checkbox">-->
+                      <!--<label>-->
+                        <!--<input type="checkbox"> 记住我-->
+                      <!--</label>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</div>-->
+
                 <div class="form-group">
                   <div class="col-sm-offset-2 col-sm-10">
                     <button type="submit" class="btn btn-primary" v-on:click="loginFunction">登录</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="img" class="col-sm-2 control-label">社交号登录:</label>
+                  <div class="col-sm-10">
+                    <img id = "img" src="../assets/img/github.svg" v-on:click="gitHubLogin"/>
                   </div>
                 </div>
               </form>
@@ -92,14 +99,13 @@
                   <label for="inputPassword3" class="col-sm-2 control-label">验证码</label>
                   <div class="col-sm-10 form-inline">
                     <input type="text" v-model='vCode' class="form-control" placeholder="验证码">
-                    <button class="btn btn-primary">发送验证码</button>
+                    <button class="btn btn-primary" v-on:click="sendfCode">发送验证码</button>
                   </div>
                 </div>
                 <div class="form-group" v-show='this.isEmail'>
                   <label for="inputPassword3" class="col-sm-2 control-label"></label>
                   <div class="col-sm-10 form-inline">
                     <input type="text" class="form-control"  value="稍后请到邮箱查收验证信息" readonly>
-                    <!--<button class="btn btn-primary">发送验证码</button>-->
                   </div>
                 </div>
                 <div class="form-group">
@@ -110,16 +116,7 @@
               </form>
             </div>
           </div>
-
-
           <div class="modal-footer">
-            <!--&lt;!&ndash;<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>&ndash;&gt;-->
-            <!--&lt;!&ndash;<button type="button" class="btn btn-primary">Save changes</button>&ndash;&gt;-->
-            <!--&lt;!&ndash;关闭按钮&ndash;&gt;-->
-            <!--&lt;!&ndash; data-dismiss="modal"&ndash;&gt;-->
-            <!--<button type="button" class="btn btn-primary" v-show="loginAndregister">登录</button>-->
-            <!--&lt;!&ndash;发送按钮&ndash;&gt;-->
-            <!--<button type="button" class="btn btn-primary" v-show="!loginAndregister">注册</button>-->
           </div>
         </div>
       </div>
@@ -130,10 +127,8 @@
 <script>
   // <!--模态框-->
   $('#exampleModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget) // Button that triggered the modal
-    var recipient = button.data('whatever') // Extract info from data-* attributes
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    var button = $(event.relatedTarget)
+    var recipient = button.data('whatever')
     var modal = $(this)
     modal.find('.modal-title').text('New message to ' + recipient)
     modal.find('.modal-body input').val(recipient)
@@ -152,6 +147,9 @@
         vCode: ''
       }
     },
+    mounted:function () {
+        this.githubgo();
+    },
     methods: {
       loginClass: function (value) {
         if (value === 'login') {
@@ -161,7 +159,7 @@
         }
       },
       showCode: function () {
-        //邮箱
+        // 邮箱
         let regEmail=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         //手机号
         let regPhone=11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
@@ -177,40 +175,67 @@
           alert("请输入正确的注册账号")
         }
       },
+
+      /**
+       * 登录
+       */
       loginFunction: function () {
-        // console.log(this.acctNo+":::::"+this.isVCode+"::::"+this.pwd)
         let data = {
-          acctNo:this.acctNo,
-          isVCode:this.isVCode,
+          logName:this.acctNo,
           pwd:this.pwd,
-          hah:this.constant.name
         }
-        this.sendToGateway(data)
+        let result = this.getResultNoSignNoEncrypt('11',this.constant.loginServiceId,'333',data).then(console.log("111111111"))
+        console.log(result);
+        // this.constant.setToken(result.token);
+        // document.cookie = "token="+result.token;
+        // console.log(this.constant.token+"=========="+this.cookie);
       },
+      /**
+       * 注册
+       */
       registerFunction: function () {
         console.log(this.acctNo+":::::"+this.vCode+"::::"+this.pwd)
+        let data = {
+          registerName:this.acctNo,
+          pwd:this.pwd,
+          registerType:'phone',
+          vcode:this.vCode.toString(),
+          Ip:'11111'
+        }
+        this.getResultNoSignNoEncrypt('14',this.constant.registerServiceId,'333',data)
+      },
+      /**
+       * 发送验证码
+       */
+      sendfCode: async function () {
+        let data = {
+          phone:this.acctNo,
+          workType:1
+        }
+        let result = this.getResultNoSignNoEncrypt('12',this.constant.SendCodeServiceId,'333',data);
+        console.log("result   "+result);
+      },
+      /**
+       * 三方登录 GitHub
+       */
+      gitHubLogin: function () {
+        window.location.href='https://github.com/login/oauth/authorize?client_id=8f693d407f5552b939fa';
+      },
+      /**
+       * 检测是否是githu登录
+       */
+      githubgo: function () {
+        console.log(location.search)
+        let code = location.search.split('=')[1];
+        if (code!==''&&code!==null){
+          console.log(code)
+
+        }else {
+          return
+        }
       }
     },
-    // computed() {
-    //   return {
-    //     acctNo:'',
-    //     // copyright(){
-    //     //   return 'Copyright &copy;'+this.year+' '+this.site  //not OK
-    //     // }
-    //   }
-    // }
-    // computed() {
-    //   return {
-    //     loginClass() {
-    //       // if(){
-    //       //   return active
-    //       // }else {
-    //       //   return null
-    //       // }
-    //       !this.loginAndregister
-    //     }
-    //   }
-    // }
+
   }
 </script>
 
