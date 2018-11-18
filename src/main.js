@@ -35,28 +35,32 @@ Vue.component(
 
 //***********************************************全局方法***********************************************
 //发送方法
-Vue.prototype.sendToGateway = function (data) {
+Vue.prototype.sendToGateway =  function (data) {
   console.log("请求参数:");
   console.log(data);
   let getwayUrl = 'http://127.0.0.1:8001/gateway';
-  axios.post(getwayUrl,data,{
-    headers: {
-      'Content-Type': 'application/json',
-      'token':'',
-    }
-  }).then(function (res) {
-    console.log("返回参数:")
-    console.log(res.data)
-    if(res.data.code !=='200'){
-      alert(res.data.msg);
-    }
-    return res.data.data;
-  }).catch(function(err) {
-    if (err.response) {
-      console.log(err.response)
-      //控制台打印错误返回的内容
-      alert(err.response)
-    }
+  let token = this.constant.token;
+  let headers  =  {
+    'Content-Type': 'application/json',
+      'token':token,
+  };
+  return new Promise(function (resolve) {
+    axios.post(getwayUrl,data,{
+      headers:headers
+    }).then(function (res) {
+      console.log("返回参数:")
+      console.log(res.data)
+      if(res.data.code !=='200'){
+        alert(res.data.msg);
+      }
+      resolve(res.data.data);
+    }).catch(function(err) {
+      if (err.response) {
+        console.log(err.response)
+        //控制台打印错误返回的内容
+        alert(err.response)
+      }
+    })
   })
 }
 //请求id方法
@@ -86,7 +90,7 @@ Vue.prototype.getData = function () {
   return year + separator + month + separator + strDate;
 }
 //请求参数组装
-Vue.prototype.getResult = function (value, serviceId, isSign, isEncrypt, userId, data) {
+Vue.prototype.getResult = async function (value, serviceId, isSign, isEncrypt, userId, data) {
   let reqId = this.getReqId(value);
   let date = this.getData();
   let params = {
@@ -101,10 +105,16 @@ Vue.prototype.getResult = function (value, serviceId, isSign, isEncrypt, userId,
   }
 
   let json = JSON.stringify(params)
-  return this.sendToGateway(json)
+  return await this.sendToGateway(json)
 }
-Vue.prototype.getResultNoSignNoEncrypt = function (value, serviceId, userId, data) {
-  return this.getResult(value, serviceId, false,false, userId,JSON.stringify(data))
+Vue.prototype.getResultNoSignNoEncrypt = async function (value, serviceId, userId, data) {
+   let a =  await this.getResult(value, serviceId, false,false, userId,JSON.stringify(data))
+  return a;
+}
+
+Vue.prototype.getResultNoSignIsEncrypt = async function (value, serviceId, userId, data) {
+  let a =  await this.getResult(value, serviceId, false,true, userId,JSON.stringify(data))
+  return a;
 }
 
 //***********************************************全局方法***********************************************

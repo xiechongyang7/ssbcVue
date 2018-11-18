@@ -20,7 +20,7 @@
                   data-whatever="@mdo" v-show="!isLogin">登录/注册
           </button>
           <!--<button type="submit" class="btn btn-default col-xs-3" v-show="!isLogin">登录/注册</button>-->
-          <button type="submit" class="btn btn-default col-xs-3" v-show="isLogin">个人中心</button>
+          <button type="submit" class="btn btn-default col-xs-3" v-show="isLogin" v-on:click="toUser()">个人中心</button>
         </form>
 
       </div>
@@ -47,7 +47,7 @@
             <div id="login" v-show="loginAndregister">
               <form class="form-horizontal">
                 <div class="form-group">
-                  <label for="inputEmail3"  class="col-sm-2 control-label">账号</label>
+                  <label for="inputEmail3" class="col-sm-2 control-label">账号</label>
                   <div class="col-sm-10">
                     <input type="text" v-model="acctNo" class="form-control" id="inputEmail3" placeholder="邮箱/手机号/用户名">
                   </div>
@@ -59,13 +59,13 @@
                   </div>
                 </div>
                 <!--<div class="form-group">-->
-                  <!--<div class="col-sm-offset-2 col-sm-10">-->
-                    <!--<div class="checkbox">-->
-                      <!--<label>-->
-                        <!--<input type="checkbox"> 记住我-->
-                      <!--</label>-->
-                    <!--</div>-->
-                  <!--</div>-->
+                <!--<div class="col-sm-offset-2 col-sm-10">-->
+                <!--<div class="checkbox">-->
+                <!--<label>-->
+                <!--<input type="checkbox"> 记住我-->
+                <!--</label>-->
+                <!--</div>-->
+                <!--</div>-->
                 <!--</div>-->
 
                 <div class="form-group">
@@ -76,7 +76,7 @@
                 <div class="form-group">
                   <label for="img" class="col-sm-2 control-label">社交号登录:</label>
                   <div class="col-sm-10">
-                    <img id = "img" src="../assets/img/github.svg" v-on:click="gitHubLogin"/>
+                    <img id="img" src="../assets/img/github.svg" v-on:click="gitHubLogin"/>
                   </div>
                 </div>
               </form>
@@ -84,15 +84,16 @@
             <div id="register" v-show="!loginAndregister">
               <form class="form-horizontal">
                 <div class="form-group">
-                  <label for="inputEmail3"  class="col-sm-2 control-label">账号</label>
+                  <label for="inputEmail3" class="col-sm-2 control-label">账号</label>
                   <div class="col-sm-10">
                     <input type="text" v-model='acctNo' class="form-control" id="inputEmail4" placeholder="邮箱/手机号">
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="inputPassword3"  class="col-sm-2 control-label">密码</label>
+                  <label for="inputPassword3" class="col-sm-2 control-label">密码</label>
                   <div class="col-sm-10">
-                    <input type="password" v-model='pwd' v-on:click="showCode" class="form-control" id="inputPassword4" placeholder="密码">
+                    <input type="password" v-model='pwd' v-on:click="showCode" class="form-control" id="inputPassword4"
+                           placeholder="密码">
                   </div>
                 </div>
                 <div class="form-group" v-show='this.isVCode'>
@@ -105,7 +106,7 @@
                 <div class="form-group" v-show='this.isEmail'>
                   <label for="inputPassword3" class="col-sm-2 control-label"></label>
                   <div class="col-sm-10 form-inline">
-                    <input type="text" class="form-control"  value="稍后请到邮箱查收验证信息" readonly>
+                    <input type="text" class="form-control" value="稍后请到邮箱查收验证信息" readonly>
                   </div>
                 </div>
                 <div class="form-group">
@@ -140,15 +141,15 @@
       return {
         isLogin: false,
         loginAndregister: true,
-        isVCode:false,
-        isEmail:false,
-        acctNo:'',
-        pwd:'',
+        isVCode: false,
+        isEmail: false,
+        acctNo: '',
+        pwd: '',
         vCode: ''
       }
     },
-    mounted:function () {
-        this.githubgo();
+    mounted: function () {
+      this.githubgo();
     },
     methods: {
       loginClass: function (value) {
@@ -160,18 +161,18 @@
       },
       showCode: function () {
         // 邮箱
-        let regEmail=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+        let regEmail = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
         //手机号
-        let regPhone=11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
-        if(this.acctNo === ''){
+        let regPhone = 11 && /^((13|14|15|17|18)[0-9]{1}\d{8})$/;
+        if (this.acctNo === '') {
           alert("请输入注册账号")
-        }else if(regPhone.test(this.acctNo)){
+        } else if (regPhone.test(this.acctNo)) {
           this.isVCode = true
           this.isEmail = false
-        }else if(regEmail.test(this.acctNo)){
+        } else if (regEmail.test(this.acctNo)) {
           this.isEmail = true
           this.isVCode = false
-        }else {
+        } else {
           alert("请输入正确的注册账号")
         }
       },
@@ -179,47 +180,60 @@
       /**
        * 登录
        */
-      loginFunction: function () {
+      loginFunction: async function () {
         let data = {
-          logName:this.acctNo,
-          pwd:this.pwd,
+          logName: this.acctNo,
+          pwd: this.pwd,
         }
-        let result = this.getResultNoSignNoEncrypt('11',this.constant.loginServiceId,'333',data).then(console.log("111111111"))
-        console.log(result);
-        // this.constant.setToken(result.token);
-        // document.cookie = "token="+result.token;
-        // console.log(this.constant.token+"=========="+this.cookie);
+        let result = await this.getResultNoSignIsEncrypt('11', this.constant.loginServiceId, '333', data);
+        console.log("返回" + result);
+        if (result !== null) {
+          this.constant.token = result.token;
+          this.isLogin = true;
+          // this.isModal = 'modal';
+          $('#exampleModal').modal('hide')
+        }
+
+
       },
       /**
        * 注册
        */
-      registerFunction: function () {
-        console.log(this.acctNo+":::::"+this.vCode+"::::"+this.pwd)
+      registerFunction: async function () {
+        console.log(this.acctNo + ":::::" + this.vCode + "::::" + this.pwd)
         let data = {
-          registerName:this.acctNo,
-          pwd:this.pwd,
-          registerType:'phone',
-          vcode:this.vCode.toString(),
-          Ip:'11111'
+          registerName: this.acctNo,
+          pwd: this.pwd,
+          registerType: 'phone',
+          vcode: this.vCode.toString(),
+          Ip: '11111'
         }
-        this.getResultNoSignNoEncrypt('14',this.constant.registerServiceId,'333',data)
+        let result = await this.getResultNoSignIsEncrypt('14', this.constant.registerServiceId, '333', data)
+        if (result != null) {
+          this.constant.token = result.token;
+          console.log(this.constant.token);
+          this.isLogin = true;
+          $('#exampleModal').modal('hide')
+        }
+
       },
       /**
        * 发送验证码
        */
       sendfCode: async function () {
         let data = {
-          phone:this.acctNo,
-          workType:1
+          phone: this.acctNo,
+          workType: 1
         }
-        let result = this.getResultNoSignNoEncrypt('12',this.constant.SendCodeServiceId,'333',data);
-        console.log("result   "+result);
+        let result = await this.getResultNoSignNoEncrypt('12', this.constant.SendCodeServiceId, '333', data);
+        console.log("result   " + result);
+        console.log(result);
       },
       /**
        * 三方登录 GitHub
        */
       gitHubLogin: function () {
-        window.location.href='https://github.com/login/oauth/authorize?client_id=8f693d407f5552b939fa';
+        window.location.href = 'https://github.com/login/oauth/authorize?client_id=8f693d407f5552b939fa';
       },
       /**
        * 检测是否是githu登录
@@ -227,12 +241,15 @@
       githubgo: function () {
         console.log(location.search)
         let code = location.search.split('=')[1];
-        if (code!==''&&code!==null){
+        if (code !== '' && code !== null) {
           console.log(code)
 
-        }else {
+        } else {
           return
         }
+      },
+      toUser: function () {
+          this.$router.push({path:'/user/111'})
       }
     },
 

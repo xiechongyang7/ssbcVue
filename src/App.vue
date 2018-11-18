@@ -11,6 +11,10 @@
 </template>
 
 <script>
+  import VueRouter from "vue-router";
+  //用户界面
+  import ssUser from './components/ssUser'
+
   export default {
     name: 'App',
     // components: {
@@ -18,6 +22,11 @@
     //   'ssFooter':ssFooter,
     //   'ssContent':ssContent
     // },
+    router:VueRouter({
+      routes: [
+        {path:"/user/:id",component:ssUser}
+      ]
+    }),
   }
 </script>
 
